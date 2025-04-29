@@ -4,7 +4,7 @@
       <div class="hamburger-container" @click="toggleSidebar">
         <el-icon :class="{'is-active': !isCollapse}"><Fold v-if="isCollapse" /><Expand v-else /></el-icon>
       </div>
-      <breadcrumb class="breadcrumb-container" />
+      <!-- <breadcrumb class="breadcrumb-container" /> -->
     </div>
     <div class="right-section">
       <el-tooltip content="全屏" placement="bottom">

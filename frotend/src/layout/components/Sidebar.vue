@@ -5,6 +5,7 @@
       :collapse="isCollapse"
       :collapse-transition="false"
       :unique-opened="true"
+      router
       class="sidebar-menu"
       background-color="#001529"
       text-color="#bfcbd9"
@@ -15,7 +16,7 @@
           <el-icon><Monitor /></el-icon>
           <span>控制台</span>
         </template>
-        <el-menu-item index="/dashboard">
+        <el-menu-item index="/dashboard" route="/dashboard">
           <el-icon><DataBoard /></el-icon>
           <span>工作台</span>
         </el-menu-item>
@@ -26,15 +27,15 @@
           <el-icon><Setting /></el-icon>
           <span>系统管理</span>
         </template>
-        <el-menu-item index="/system/user">
+        <el-menu-item index="/system/user" route="/system/user">
           <el-icon><User /></el-icon>
           <span>用户管理</span>
         </el-menu-item>
-        <el-menu-item index="/system/role">
+        <el-menu-item index="/system/role" route="/system/role">
           <el-icon><UserFilled /></el-icon>
           <span>角色管理</span>
         </el-menu-item>
-        <el-menu-item index="/system/menu">
+        <el-menu-item index="/system/menu" route="/system/menu">
           <el-icon><Menu /></el-icon>
           <span>菜单管理</span>
         </el-menu-item>

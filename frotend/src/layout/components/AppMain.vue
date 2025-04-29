@@ -3,7 +3,7 @@
     <router-view v-slot="{ Component }">
       <transition name="fade-transform" mode="out-in">
         <keep-alive>
-          <component :is="Component" />
+          <component :is="Component" :key="$route.path" />
         </keep-alive>
       </transition>
     </router-view>
@@ -11,7 +11,9 @@
 </template>
 
 <script setup lang="ts">
-// 主要显示路由视图，无需额外逻辑
+import { useRoute } from 'vue-router'
+
+const $route = useRoute()
 </script>
 
 <style scoped>

@@ -39,9 +39,14 @@ const toggleSidebar = () => {
   height: 100vh;
   width: 100%;
   display: flex;
+  overflow: hidden;
 }
 
 .sidebar-container {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
   z-index: 1001;
 }
 
@@ -51,6 +56,7 @@ const toggleSidebar = () => {
   display: flex;
   flex-direction: column;
   transition: margin-left 0.3s;
+  width: 100%;
 }
 
 .app-container.sidebar-collapse .main-container {
@@ -74,6 +80,7 @@ const toggleSidebar = () => {
 
 .app-main-container {
   flex: 1;
-  overflow: hidden;
+  overflow: auto;
+  width: 100%;
 }
 </style> 

@@ -48,16 +48,10 @@ const visitedViews = reactive<TagView[]>([
 const route = useRoute()
 const router = useRouter()
 
-// 监听路由变化，添加标签
-watch(() => route.path, (newPath) => {
-  if (newPath !== '/login') {
-    addVisitedView(route)
-  }
-}, { immediate: true })
-
 // 添加访问过的视图
 const addVisitedView = (view: any) => {
   const { path, meta } = view
+  // 避免重复添加相同的标签
   if (visitedViews.some(v => v.path === path)) return
   
   visitedViews.push({
@@ -65,6 +59,13 @@ const addVisitedView = (view: any) => {
     path: path
   })
 }
+
+// 监听路由变化，添加标签
+watch(() => route.path, (newPath) => {
+  if (newPath !== '/login') {
+    addVisitedView(route)
+  }
+}, { immediate: true })
 
 // 判断标签是否激活
 const isActive = (tag: TagView) => {

@@ -23,7 +23,9 @@ import { ElMessage } from 'element-plus'
 import axios from 'axios'
 import { User, Lock } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const form = ref({
   username: '',
   password: ''
@@ -44,7 +46,8 @@ const onSubmit = async () => {
     localStorage.setItem('token', res.data.access)
     localStorage.setItem('refresh_token', res.data.refresh)
     ElMessage.success('登录成功')
-    // 登录成功后跳转首页
+    // 登录成功后跳转到首页
+    router.push('/')
   } catch (e) {
     ElMessage.error('用户名或密码错误')
   } finally {

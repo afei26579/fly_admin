@@ -6,19 +6,19 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/Login.vue'),
+    component: () => import('@/views/Login.vue'),
     meta: { title: '登录', hidden: true }
   },
   {
     path: '/',
     name: 'Layout',
-    component: () => import('../layout/index.vue'),
+    component: () => import('@/layout/index.vue'),
     redirect: '/dashboard',
     children: [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => import('../views/dashboard/index.vue'),
+        component: () => import('@/views/dashboard/index.vue'),
         meta: { title: '首页', icon: 'DataBoard' }
       }
     ]
@@ -26,26 +26,26 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/system',
     name: 'System',
-    component: () => import('../layout/index.vue'),
+    component: () => import('@/layout/index.vue'),
     redirect: '/system/user',
     meta: { title: '系统管理', icon: 'Setting' },
     children: [
       {
         path: 'user',
         name: 'User',
-        component: () => import('../views/dashboard/index.vue'), // 临时使用dashboard页面
+        component: () => import('@/views/system/user/index.vue'),
         meta: { title: '用户管理', icon: 'User' }
       },
       {
         path: 'role',
         name: 'Role',
-        component: () => import('../views/dashboard/index.vue'), // 临时使用dashboard页面
+        component: () => import('@/views/system/role/index.vue'),
         meta: { title: '角色管理', icon: 'UserFilled' }
       },
       {
         path: 'menu',
         name: 'Menu',
-        component: () => import('../views/dashboard/index.vue'), // 临时使用dashboard页面
+        component: () => import('@/views/system/menu/index.vue'),
         meta: { title: '菜单管理', icon: 'Menu' }
       }
     ]
@@ -54,7 +54,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('../views/Login.vue'), // 临时使用登录页面作为404页面
+    component: () => import('@/views/Login.vue'), // 临时使用登录页面作为404页面
     meta: { hidden: true }
   }
 ]
