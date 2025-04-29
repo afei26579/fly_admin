@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Django
+*.log
+*.pot
+*.pyc
+*.pyo
+*.db
+*.sqlite3
+
+# Virtualenv
+venv/
+ENV/
+env/
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Media
+media/
+avatars/
+
+# Database
+*.sqlite3
+*.db
+
+# Migrations (optional, if you want to ignore pyc in migrations)
+*/migrations/__pycache__/
+
+# Ignore local settings (if any)
+local_settings.py
+
+# Ignore compiled files
+*.so
+
+# Ignore test coverage
+htmlcov/
+.coverage
+.tox/
+
+# Ignore pip cache
+pip-wheel-metadata/ 
