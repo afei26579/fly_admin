@@ -5,31 +5,26 @@
           v-for="tag in visitedViews" 
           :key="tag.path" 
           :class="isActive(tag) ? 'active' : ''" 
-          @click="handleTagClick(tag)">
+          @click="handleTagClick(tag)"
+          @contextmenu.prevent="openContextMenu($event, tag)">
         <span>{{ tag.title }}</span>
         <el-icon v-if="!isFixedTag(tag)" class="close-icon" @click.stop="handleCloseTag(tag)"><Close /></el-icon>
       </div>
     </el-scrollbar>
-    <div class="tags-view-actions">
-      <el-dropdown trigger="click" @command="handleCommand">
-        <span class="actions-icon">
-          <el-icon><ArrowDown /></el-icon>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="closeOthers">关闭其他</el-dropdown-item>
-            <el-dropdown-item command="closeAll">关闭所有</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+    
+    <!-- 右键菜单 -->
+    <div v-show="visible" :style="{left: left+'px', top: top+'px'}" class="contextmenu">
+      <div class="menu-item" @click="handleCloseRightTags">关闭右侧</div>
+      <div class="menu-item" @click="handleCloseOtherTags">关闭其他</div>
+      <div class="menu-item" @click="handleCloseAllTags">关闭所有</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, computed } from 'vue'
+import { ref, reactive, watch, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Close, ArrowDown } from '@element-plus/icons-vue'
+import { Close } from '@element-plus/icons-vue'
 
 // 模拟固定标签
 const fixedTags = ['/dashboard']
@@ -47,6 +42,12 @@ const visitedViews = reactive<TagView[]>([
 
 const route = useRoute()
 const router = useRouter()
+
+// 右键菜单相关
+const visible = ref(false)
+const top = ref(0)
+const left = ref(0)
+const selectedTag = ref<TagView | null>(null)
 
 // 添加访问过的视图
 const addVisitedView = (view: any) => {
@@ -96,39 +97,97 @@ const handleCloseTag = (tag: TagView) => {
   }
 }
 
-// 处理下拉菜单命令
-const handleCommand = (command: string) => {
-  if (command === 'closeOthers') {
-    // 关闭其他标签
-    const activeTag = visitedViews.find(tag => isActive(tag))
-    const fixedTagsList = visitedViews.filter(tag => isFixedTag(tag))
-    
-    visitedViews.length = 0
-    if (activeTag) {
-      visitedViews.push(activeTag)
-    }
-    
-    // 保留固定标签
-    fixedTagsList.forEach(tag => {
-      if (!visitedViews.some(v => v.path === tag.path)) {
-        visitedViews.push(tag)
+// 打开右键菜单
+const openContextMenu = (e: MouseEvent, tag: TagView) => {
+  e.preventDefault()
+  selectedTag.value = tag
+  visible.value = true
+  left.value = e.clientX
+  top.value = e.clientY
+}
+
+// 关闭右侧标签
+const handleCloseRightTags = () => {
+  if (!selectedTag.value) return
+  closeContextMenu()
+  
+  const index = visitedViews.findIndex(item => item.path === selectedTag.value?.path)
+  if (index === -1) return
+  
+  // 保留固定标签和当前点击的标签左侧的标签
+  const rightTags = visitedViews.slice(index + 1)
+  rightTags.forEach(tag => {
+    if (!isFixedTag(tag)) {
+      const tagIndex = visitedViews.findIndex(v => v.path === tag.path)
+      if (tagIndex > -1) {
+        visitedViews.splice(tagIndex, 1)
       }
-    })
-  } else if (command === 'closeAll') {
-    // 关闭所有标签，只保留固定标签
-    const fixedTagsList = visitedViews.filter(tag => isFixedTag(tag))
-    visitedViews.length = 0
-    
-    fixedTagsList.forEach(tag => {
-      visitedViews.push(tag)
-    })
-    
-    // 跳转到第一个固定标签
-    if (fixedTagsList.length) {
-      router.push(fixedTagsList[0].path)
     }
+  })
+  
+  // 如果当前路由的标签被关闭，需要跳转到最后一个标签
+  if (!visitedViews.some(tag => tag.path === route.path)) {
+    const latestView = visitedViews[visitedViews.length - 1]
+    router.push(latestView.path)
   }
 }
+
+// 关闭其他标签
+const handleCloseOtherTags = () => {
+  closeContextMenu()
+  
+  const activeTag = visitedViews.find(tag => isActive(tag))
+  const fixedTagsList = visitedViews.filter(tag => isFixedTag(tag))
+  
+  visitedViews.length = 0
+  if (activeTag) {
+    visitedViews.push(activeTag)
+  }
+  
+  // 保留固定标签
+  fixedTagsList.forEach(tag => {
+    if (!visitedViews.some(v => v.path === tag.path)) {
+      visitedViews.push(tag)
+    }
+  })
+}
+
+// 关闭所有标签
+const handleCloseAllTags = () => {
+  closeContextMenu()
+  
+  // 关闭所有标签，只保留固定标签
+  const fixedTagsList = visitedViews.filter(tag => isFixedTag(tag))
+  visitedViews.length = 0
+  
+  fixedTagsList.forEach(tag => {
+    visitedViews.push(tag)
+  })
+  
+  // 跳转到第一个固定标签
+  if (fixedTagsList.length) {
+    router.push(fixedTagsList[0].path)
+  }
+}
+
+// 关闭右键菜单
+const closeContextMenu = () => {
+  visible.value = false
+}
+
+// 点击页面其他位置关闭右键菜单
+const handleClickOutside = () => {
+  closeContextMenu()
+}
+
+// 添加和移除全局点击事件
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>
@@ -138,6 +197,7 @@ const handleCommand = (command: string) => {
   border-bottom: 1px solid #d8dce5;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 0 3px 0 rgba(0, 0, 0, 0.04);
   display: flex;
+  position: relative;
 }
 
 .tags-view-wrapper {
@@ -195,15 +255,29 @@ const handleCommand = (command: string) => {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-.tags-view-actions {
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-  cursor: pointer;
+/* 右键菜单样式 */
+.contextmenu {
+  position: fixed;
+  z-index: 3000;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  min-width: 120px;
 }
 
-.actions-icon {
-  font-size: 16px;
-  color: #666;
+.menu-item {
+  cursor: pointer;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: #333;
+}
+
+.menu-item:hover {
+  background: #f5f7fa;
+  color: #1890ff;
+}
+
+.menu-item:not(:last-child) {
+  border-bottom: 1px solid #ebeef5;
 }
 </style> 
